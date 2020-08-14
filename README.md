@@ -25,8 +25,8 @@ https://github.com/mbfx/otus-linux-adm/tree/master/selinux_dns_problems
   
 - Поскольку пакет nginx уже установлен с Vagrantfile-a предназначенного для данного ДЗ, то сразу зайдем в ```/etc/nginx/nginx.conf``` и поменяем стандартный 80-й порт на 11988. 
 - ```[root@docker vagrant]# systemctl restart nginx```
-``````Job for nginx.service failed because the control process exited with error code. See "systemctl status nginx.service" and "journalctl -xe" for details.```
-[root@docker vagrant]# journalctl -u nginx -n 30
+```Job for nginx.service failed because the control process exited with error code. See "systemctl status nginx.service" and "journalctl -xe" for details.```
+```[root@docker vagrant]# journalctl -u nginx -n 30
 -- Logs begin at Fri 2020-08-14 08:39:06 UTC, end at Fri 2020-08-14 09:15:49 UTC. --
 Aug 14 09:03:22 docker systemd[1]: Unit nginx.service cannot be reloaded because it is inactive.
 Aug 14 09:15:47 docker systemd[1]: Starting The nginx HTTP and reverse proxy server...
