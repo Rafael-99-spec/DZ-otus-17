@@ -39,7 +39,8 @@ Aug 14 09:15:47 docker nginx[4171]: nginx: configuration file /etc/nginx/nginx.c
 Aug 14 09:15:47 docker systemd[1]: nginx.service: control process exited, code=exited status=1
 Aug 14 09:15:47 docker systemd[1]: Failed to start The nginx HTTP and reverse proxy server.
 Aug 14 09:15:47 docker systemd[1]: Unit nginx.service entered failed state.
-Aug 14 09:15:47 docker systemd[1]: nginx.service failed.```
+Aug 14 09:15:47 docker systemd[1]: nginx.service failed.
+```
 
 - Как описано по выводам команд сверху, selinux не позваляет nginx поменять стандартный порт службы на 11988, для выяснения причины опять же воспользуемся audit2why (rjvfylf - ```audit2why < /var/log/audit/audit.log```). 
 - Утилита audit2why рекомендует выполнить команду - ```setsebool -P nis_enabled 1```
