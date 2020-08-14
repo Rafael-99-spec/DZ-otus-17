@@ -77,3 +77,28 @@ tcp6       0      0 :::11988                :::*                    LISTEN      
 
 #### 1.2 Добавление нестандартного порта в имеющийся тип
 
+- Для того чтобы пролистать все порты входящие в тип - http_port_t, достаточно выполнить команду - ```semanage port -l | grep http```. 
+```
+[root@docker vagrant]# semanage port -l | grep http
+http_cache_port_t              tcp      8080, 8118, 8123, 10001-10010
+http_cache_port_t              udp      3130
+http_port_t                    tcp      80, 81, 443, 488, 8008, 8009, 8443, 9000
+pegasus_http_port_t            tcp      5988
+pegasus_https_port_t           tcp      5989
+```
+- Для добавления нестандартного порта внужный нам тип опять же воспользуемся утилитой ```semanage```
+```
+[root@docker vagrant]# semanage port -a -t http_port_t -p tcp 11988
+[root@docker vagrant]# semanage port -l | grep http
+http_cache_port_t              tcp      8080, 8118, 8123, 10001-10010
+http_cache_port_t              udp      3130
+http_port_t                    tcp      11988, 80, 81, 443, 488, 8008, 8009, 8443, 9000
+pegasus_http_port_t            tcp      5988
+pegasus_https_port_t           tcp      5989
+
+```
+
+#### 1.3 Формирование и установка модуля SELinux.
+
+
+
