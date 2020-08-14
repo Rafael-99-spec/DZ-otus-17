@@ -23,4 +23,4 @@ https://github.com/mbfx/otus-linux-adm/tree/master/selinux_dns_problems
 
 #####  1.1 Переключатели setsebool
   
-  Поскольку пакет nginx уже установлен с Vagrantfile-a предназначенного для данного ДЗ, то сразу зайдем в ```/etc/nginx/nginx.conf``` и поменяем стандартный 80-й порт на 11899 
+- Поскольку пакет nginx уже установлен с Vagrantfile-a предназначенного для данного ДЗ, то сразу зайдем в ```/etc/nginx/nginx.conf``` и поменяем стандартный 80-й порт на 11899 
