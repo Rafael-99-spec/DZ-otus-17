@@ -100,5 +100,35 @@ pegasus_https_port_t           tcp      5989
 
 #### 1.3 Формирование и установка модуля SELinux.
 
+- Опять же поменяем порт 80 на 11988 в ```/etc/nginx/nginx.conf```. 
+- Далее скомпилируем модуль на основе лог файла - ```/var/log/audit/audit.log```, в котором содержится информация о запретах и установим созданный модуль.
+```
+[root@docker vagrant]# audit2allow -M httpd_new --debug < /var/log/audit/audit.log
+******************** IMPORTANT ***********************
+To make this policy package active, execute:
+
+semodule -i httpd_new.pp
+[root@docker vagrant]# ll
+total 8
+-rw-r--r--. 1 root root 964 Aug 14 10:46 httpd_new.pp
+-rw-r--r--. 1 root root 261 Aug 14 10:46 httpd_new.te
+[root@docker vagrant]# semodule -i httpd_new.pp
+[root@docker vagrant]# semodule -l | grep http
+httpd_new	1.0
+[root@docker vagrant]# 
+```
+- Проверим работу nginx по настроенному порту 
+```
+[root@docker vagrant]# netstat -tunap
+Active Internet connections (servers and established)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name    
+tcp        0      0 0.0.0.0:111             0.0.0.0:*               LISTEN      352/rpcbind         
+tcp        0      0 0.0.0.0:11988           0.0.0.0:*               LISTEN      3950/nginx: master  
+tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      613/sshd            
+tcp        0      0 127.0.0.1:25            0.0.0.0:*               LISTEN      701/master          
+tcp        0      0 10.0.2.15:22            10.0.2.2:52344          ESTABLISHED 3731/sshd: vagrant  
+tcp6       0      0 :::111                  :::*                    LISTEN      352/rpcbind         
+tcp6       0      0 :::11988                :::*                    LISTEN      3950/nginx: master  
+```
 
 
