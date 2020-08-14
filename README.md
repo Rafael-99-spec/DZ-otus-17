@@ -30,7 +30,7 @@ https://github.com/mbfx/otus-linux-adm/tree/master/selinux_dns_problems
 
 ```[root@docker vagrant]# journalctl -u nginx -n 30```
 
-```-- Logs begin at Fri 2020-08-14 08:39:06 UTC, end at Fri 2020-08-14 09:15:49 UTC. --
+-- Logs begin at Fri 2020-08-14 08:39:06 UTC, end at Fri 2020-08-14 09:15:49 UTC. --
 Aug 14 09:03:22 docker systemd[1]: Unit nginx.service cannot be reloaded because it is inactive.
 Aug 14 09:15:47 docker systemd[1]: Starting The nginx HTTP and reverse proxy server...
 Aug 14 09:15:47 docker nginx[4171]: nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
@@ -40,4 +40,6 @@ Aug 14 09:15:47 docker systemd[1]: nginx.service: control process exited, code=e
 Aug 14 09:15:47 docker systemd[1]: Failed to start The nginx HTTP and reverse proxy server.
 Aug 14 09:15:47 docker systemd[1]: Unit nginx.service entered failed state.
 Aug 14 09:15:47 docker systemd[1]: nginx.service failed.```
+
+- Как 
 
