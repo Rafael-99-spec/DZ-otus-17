@@ -42,6 +42,36 @@ Aug 14 09:15:47 docker systemd[1]: Unit nginx.service entered failed state.
 Aug 14 09:15:47 docker systemd[1]: nginx.service failed.
 ```
 
-- Как описано по выводам команд сверху, selinux не позваляет nginx поменять стандартный порт службы на 11988, для выяснения причины опять же воспользуемся audit2why (rjvfylf - ```audit2why < /var/log/audit/audit.log```). 
-- Утилита audit2why рекомендует выполнить команду - ```setsebool -P nis_enabled 1```
+- Как описано по выводам команд сверху, selinux не позваляет nginx поменять стандартный порт службы на 11988, для выяснения причины опять же воспользуемся ```audit2why``` (команда - ```audit2why < /var/log/audit/audit.log```). 
+- Утилита audit2why рекомендует выполнить команду - ```setsebool -P nis_enabled 1```. После выполнения включения данного boolean по рекомендации ```audit2why```, nginx успешно запускается.
+```
+[root@docker vagrant]# audit2why < /var/log/audit/audit.log
+type=AVC msg=audit(1597396547.646:1226): avc:  denied  { name_bind } for  pid=4171 comm="nginx" src=11988 scontext=system_u:system_r:httpd_t:s0 tcontext=system_u:object_r:unreserved_port_t:s0 tclass=tcp_socket permissive=0
+
+	Was caused by:
+	The boolean nis_enabled was set incorrectly. 
+	Description:
+	Allow nis to enabled
+
+	Allow access by executing:
+	# setsebool -P nis_enabled 1
+[root@docker vagrant]# setsebool -P nis_enabled 1
+[root@docker vagrant]# systemctl restart nginx
+[root@docker vagrant]# systemctl status nginx
+● nginx.service - The nginx HTTP and reverse proxy server
+   Loaded: loaded (/usr/lib/systemd/system/nginx.service; disabled; vendor preset: disabled)
+   Active: active (running) since Fri 2020-08-14 09:28:01 UTC; 5s ago
+```
+```
+[root@docker vagrant]# netstat -tunap
+Active Internet connections (servers and established)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name    
+tcp        0      0 0.0.0.0:111             0.0.0.0:*               LISTEN      336/rpcbind         
+tcp        0      0 0.0.0.0:11988           0.0.0.0:*               LISTEN      4211/nginx: master  
+tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      611/sshd            
+tcp        0      0 127.0.0.1:25            0.0.0.0:*               LISTEN      701/master          
+tcp        0      0 10.0.2.15:22            10.0.2.2:51250          ESTABLISHED 3957/sshd: vagrant  
+tcp6       0      0 :::111                  :::*                    LISTEN      336/rpcbind         
+tcp6       0      0 :::11988                :::*                    LISTEN      4211/nginx: master  
+```
 
