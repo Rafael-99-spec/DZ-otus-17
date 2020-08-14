@@ -37,5 +37,4 @@ Aug 14 09:15:47 docker systemd[1]: nginx.service: control process exited, code=e
 Aug 14 09:15:47 docker systemd[1]: Failed to start The nginx HTTP and reverse proxy server.
 Aug 14 09:15:47 docker systemd[1]: Unit nginx.service entered failed state.
 Aug 14 09:15:47 docker systemd[1]: nginx.service failed.
-[root@docker vagrant]# ```
 
