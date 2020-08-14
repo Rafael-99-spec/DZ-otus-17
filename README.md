@@ -86,7 +86,7 @@ http_port_t                    tcp      80, 81, 443, 488, 8008, 8009, 8443, 9000
 pegasus_http_port_t            tcp      5988
 pegasus_https_port_t           tcp      5989
 ```
-- Для добавления нестандартного порта внужный нам тип опять же воспользуемся утилитой ```semanage```
+- Для добавления нестандартного порта внужный нам тип опять же воспользуемся утилитой ```semanage```.
 ```
 [root@docker vagrant]# semanage port -a -t http_port_t -p tcp 11988
 [root@docker vagrant]# semanage port -l | grep http
