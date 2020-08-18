@@ -133,5 +133,33 @@ tcp6       0      0 :::11988                :::*                    LISTEN      
 
 ### 2. Обеспечить работоспособность приложения при включенном selinux.
 - Скачиваем стенд из репозитория https://github.com/mbfx/otus-linux-adm, и поднимаем стенд с помощью команды ```vagrant up``` из под папки selinux_dns_problems/
-- 
+- После подключения к клиентсой машине попробуем выполнить след. команду, предназначенную для обновления зоны и добавления в нее новой записи, после чего получим ошибку
+```
+[root@client vagrant]# nsupdate -k /etc/named.zonetransfer.key
+> server 192.168.50.10
+> zone ddns.lab
+> update add www.ddns.lab. 60 A 192.168.50.15
+> send
+update failed: SERVFAIL
+> 
+```
+#### 2.1 Удаление всех исключений 
+- Выполним команду ```audit2why < /var/log/audit/audit.log```
+```
+[root@ns01 vagrant]# audit2why < /var/log/audit/audit.log
+type=AVC msg=audit(1597735776.757:2037): avc:  denied  { create } for  pid=5242 comm="isc-worker0000" name="named.ddns.lab.view1.jnl" scontext=system_u:system_r:named_t:s0 tcontext=system_u:object_r:etc_t:s0 tclass=file permissive=0
 
+	Was caused by:
+		Missing type enforcement (TE) allow rule.
+
+		You can use audit2allow to generate a loadable module to allow this access.
+```
+- Далее выполняем команду ```audit2allow -M named-selinux --debug < /var/log/audit/audit.log``` и ```semodule -i named-selinux.p```
+- Далее при проверке лог файла видим ошибку, в котором описываются необходимые шаги для предоставления SELinux-ом доступа(```ausearch -c 'isc-worker0000' --raw | audit2allow -M my-iscworker0000 | semodule -i my-iscworker0000.pp```)
+```
+[root@ns01 vagrant]# cat /var/log/messages | grep ausearch
+Aug 18 07:29:44 localhost python: SELinux is preventing /usr/sbin/named from create access on the file named.ddns.lab.view1.jnl.#012#012*****  Plugin catchall_labels (83.8 confidence) suggests   *******************#012#012If you want to allow named to have create access on the named.ddns.lab.view1.jnl file#012Then you need to change the label on named.ddns.lab.view1.jnl#012Do#012# semanage fcontext -a -t FILE_TYPE 'named.ddns.lab.view1.jnl'#012where FILE_TYPE is one of the following: dnssec_trigger_var_run_t, ipa_var_lib_t, krb5_host_rcache_t, krb5_keytab_t, named_cache_t, named_log_t, named_tmp_t, named_var_run_t, named_zone_t.#012Then execute:#012restorecon -v 'named.ddns.lab.view1.jnl'#012#012#012*****  Plugin catchall (17.1 confidence) suggests   **************************#012#012If you believe that named should be allowed create access on the named.ddns.lab.view1.jnl file by default.#012Then you should report this as a bug.#012You can generate a local policy module to allow this access.#012Do#012allow this access for now by executing:#012# ausearch -c 'isc-worker0000' --raw | audit2allow -M my-iscworker0000#012# semodule -i my-iscworker0000.pp#012
+```
+```
+[root@ns01 vagrant]# ausearch -c 'isc-worker0000' --raw | audit2allow -M my-iscworker0000 | semodule -i my-iscworker0000.pp
+```
