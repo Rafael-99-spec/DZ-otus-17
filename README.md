@@ -169,18 +169,6 @@ To make this policy package active, execute:
 
 semodule -i named_t.pp
 
-[root@ns01 vagrant]# audit2allow -a -M named_t 
-******************** IMPORTANT ***********************
-To make this policy package active, execute:
-
-semodule -i named_t.pp
-
-[root@ns01 vagrant]# audit2allow -a -M named_t
-******************** IMPORTANT ***********************
-To make this policy package active, execute:
-
-semodule -i named_t.pp
-
 [root@ns01 vagrant]# semodule -i named_t.pp
 [root@ns01 vagrant]# systemctl restart named
 ```
