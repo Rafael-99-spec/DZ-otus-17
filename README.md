@@ -143,7 +143,7 @@ tcp6       0      0 :::11988                :::*                    LISTEN      
 update failed: SERVFAIL
 > 
 ```
-- Выполним команду ```audit2why < /var/log/audit/audit.log```
+- Выполним команду ```audit2why < /var/log/audit/audit.log``` для того чтобы выяснить по какой именно причине selinux нам не дает обновить нашу зону и какой модль ему для этого необходим.
 ```
 [root@ns01 vagrant]# audit2why < /var/log/audit/audit.log
 type=AVC msg=audit(1598303918.278:786): avc:  denied  { write } for  pid=2953 comm="isc-worker0000" path="/etc/named/dynamic/named.ddns.lab.view1.jnl" dev="sda1" ino=12185 scontext=system_u:system_r:named_t:s0 tcontext=system_u:object_r:etc_t:s0 tclass=file permissive=0
@@ -153,7 +153,7 @@ type=AVC msg=audit(1598303918.278:786): avc:  denied  { write } for  pid=2953 co
 
 		You can use audit2allow to generate a loadable module to allow this access.
 ```
-- Далее выполняем следующие команды 
+Как видим нужно дать необходимые разрешения для named_t  
 ```
 [root@ns01 vagrant]# audit2allow -a 
 
@@ -162,6 +162,9 @@ type=AVC msg=audit(1598303918.278:786): avc:  denied  { write } for  pid=2953 co
 
 #!!!! WARNING: 'etc_t' is a base type.
 allow named_t etc_t:file create;
+```
+Для этого используемся утилитой audit2allow и выполним след команды, после сразу перезапустим нашу службу dns
+```
 [root@ns01 vagrant]# audit2allow -a -M named_t 
 ******************** IMPORTANT ***********************
 To make this policy package active, execute:
@@ -171,6 +174,7 @@ semodule -i named_t.pp
 [root@ns01 vagrant]# semodule -i named_t.pp
 [root@ns01 vagrant]# systemctl restart named
 ```
+Вернемся на клиентскую ВМ и заново попробуем добавить хостовую запись на наш dns-сервер
 ```
 [vagrant@client ~]$ nsupdate -k /etc/named.zonetransfer.key
 > server 192.168.50.10
@@ -179,6 +183,7 @@ semodule -i named_t.pp
 > send
 > 
 ```
+Как видим, никаких проблем на этот раз у нас не возниклоЮ значит внесенные нами изменения дали необходимый рпезультат, чтобы оконччательно в этом убедиться проверим состояние службы, где увидим что наша запись добавлена.
 ```
 [root@ns01 vagrant]# systemctl status named
 ● named.service - Berkeley Internet Name Domain (DNS)
