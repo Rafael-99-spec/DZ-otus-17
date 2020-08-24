@@ -152,8 +152,7 @@ type=AVC msg=audit(1598303918.278:786): avc:  denied  { write } for  pid=2953 co
 		Missing type enforcement (TE) allow rule.
 
 		You can use audit2allow to generate a loadable module to allow this access.
-```
-Как видим нужно дать необходимые разрешения для named_t  
+``` 
 ```
 [root@ns01 vagrant]# audit2allow -a 
 
@@ -163,6 +162,8 @@ type=AVC msg=audit(1598303918.278:786): avc:  denied  { write } for  pid=2953 co
 #!!!! WARNING: 'etc_t' is a base type.
 allow named_t etc_t:file create;
 ```
+Как видим нужно дать необходимые разрешения для named_t 
+
 Для этого используемся утилитой audit2allow и выполним след команды, после сразу перезапустим нашу службу dns
 ```
 [root@ns01 vagrant]# audit2allow -a -M named_t 
