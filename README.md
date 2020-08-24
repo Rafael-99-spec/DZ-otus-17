@@ -175,14 +175,6 @@ To make this policy package active, execute:
 
 semodule -i named_t.pp
 
-[root@ns01 vagrant]# ll
-total 8
--rw-r--r--. 1 root root 923 Aug 24 20:53 named_t.pp
--rw-r--r--. 1 root root 194 Aug 24 20:53 named_t.te
-[root@ns01 vagrant]# semodule -i named_t.pp
-
-```
-
 [root@ns01 vagrant]# audit2allow -a -M named_t
 ******************** IMPORTANT ***********************
 To make this policy package active, execute:
@@ -191,6 +183,16 @@ semodule -i named_t.pp
 
 [root@ns01 vagrant]# semodule -i named_t.pp
 [root@ns01 vagrant]# systemctl restart named
+```
+```
+[vagrant@client ~]$ nsupdate -k /etc/named.zonetransfer.key
+> server 192.168.50.10
+> zone ddns.lab
+> update add www.ddns.lab. 60 A 192.168.50.15
+> send
+> 
+```
+```
 [root@ns01 vagrant]# systemctl status named
 ● named.service - Berkeley Internet Name Domain (DNS)
    Loaded: loaded (/usr/lib/systemd/system/named.service; enabled; vendor preset: disabled)
@@ -212,12 +214,4 @@ Aug 24 21:24:52 ns01 named[3019]: managed-keys-zone/default: Unable to fetch DNS
 Aug 24 21:24:52 ns01 named[3019]: resolver priming query complete
 Aug 24 21:26:01 ns01 named[3019]: client @0x7f0b1803c3e0 192.168.50.15#48036/key zonetransfer.key: view view1: signer "zonetransfer.key" approved
 Aug 24 21:26:01 ns01 named[3019]: client @0x7f0b1803c3e0 192.168.50.15#48036/key zonetransfer.key: view view1: updating zone 'ddns.lab/IN': adding an RR at 'www.ddns.lab' A 192.168.50.15
-
-```
-[vagrant@client ~]$ nsupdate -k /etc/named.zonetransfer.key
-> server 192.168.50.10
-> zone ddns.lab
-> update add www.ddns.lab. 60 A 192.168.50.15
-> send
-> 
 ```
