@@ -147,7 +147,7 @@ update failed: SERVFAIL
 - Выполним команду ```audit2why < /var/log/audit/audit.log```
 ```
 [root@ns01 vagrant]# audit2why < /var/log/audit/audit.log
-type=AVC msg=audit(1597735776.757:2037): avc:  denied  { create } for  pid=5242 comm="isc-worker0000" name="named.ddns.lab.view1.jnl" scontext=system_u:system_r:named_t:s0 tcontext=system_u:object_r:etc_t:s0 tclass=file permissive=0
+type=AVC msg=audit(1598303918.278:786): avc:  denied  { write } for  pid=2953 comm="isc-worker0000" path="/etc/named/dynamic/named.ddns.lab.view1.jnl" dev="sda1" ino=12185 scontext=system_u:system_r:named_t:s0 tcontext=system_u:object_r:etc_t:s0 tclass=file permissive=0
 
 	Was caused by:
 		Missing type enforcement (TE) allow rule.
@@ -182,33 +182,42 @@ total 8
 [root@ns01 vagrant]# semodule -i named_t.pp
 
 ```
-```
-[root@ns01 vagrant]# nsupdate -k /etc/named.zonetransfer.key
-> server 192.168.50.10
-incorrect section name: >
-> server 192.168.50.10
-> update add www.ddns.lab. 60 A 192.168.50.15
-> send
-response to SOA query was unsuccessful
+
+[root@ns01 vagrant]# audit2allow -a -M named_t
+******************** IMPORTANT ***********************
+To make this policy package active, execute:
+
+semodule -i named_t.pp
+
+[root@ns01 vagrant]# semodule -i named_t.pp
+[root@ns01 vagrant]# systemctl restart named
 [root@ns01 vagrant]# systemctl status named
 ● named.service - Berkeley Internet Name Domain (DNS)
    Loaded: loaded (/usr/lib/systemd/system/named.service; enabled; vendor preset: disabled)
-   Active: active (running) since Mon 2020-08-24 21:10:48 UTC; 1min 33s ago
-  Process: 2846 ExecStop=/bin/sh -c /usr/sbin/rndc stop > /dev/null 2>&1 || /bin/kill -TERM $MAINPID (code=exited, status=0/SUCCESS)
-  Process: 2859 ExecStart=/usr/sbin/named -u named -c ${NAMEDCONF} $OPTIONS (code=exited, status=0/SUCCESS)
-  Process: 2857 ExecStartPre=/bin/bash -c if [ ! "$DISABLE_ZONE_CHECKING" == "yes" ]; then /usr/sbin/named-checkconf -z "$NAMEDCONF"; else echo "Checking of zone files is disabled"; fi (code=exited, status=0/SUCCESS)
- Main PID: 2861 (named)
+   Active: active (running) since Mon 2020-08-24 21:24:42 UTC; 1min 40s ago
+  Process: 3004 ExecStop=/bin/sh -c /usr/sbin/rndc stop > /dev/null 2>&1 || /bin/kill -TERM $MAINPID (code=exited, status=0/SUCCESS)
+  Process: 3017 ExecStart=/usr/sbin/named -u named -c ${NAMEDCONF} $OPTIONS (code=exited, status=0/SUCCESS)
+  Process: 3015 ExecStartPre=/bin/bash -c if [ ! "$DISABLE_ZONE_CHECKING" == "yes" ]; then /usr/sbin/named-checkconf -z "$NAMEDCONF"; else echo "Checking of zone files is disabled"; fi (code=exited, status=0/SUCCESS)
+ Main PID: 3019 (named)
    CGroup: /system.slice/named.service
-           └─2861 /usr/sbin/named -u named -c /etc/named.conf
+           └─3019 /usr/sbin/named -u named -c /etc/named.conf
 
-Aug 24 21:10:48 ns01 named[2861]: network unreachable resolving './DNSKEY/IN': 2001:500:12::d0d#53
-Aug 24 21:10:48 ns01 named[2861]: network unreachable resolving './NS/IN': 2001:500:12::d0d#53
-Aug 24 21:10:48 ns01 named[2861]: network unreachable resolving './DNSKEY/IN': 2001:7fd::1#53
-Aug 24 21:10:48 ns01 named[2861]: network unreachable resolving './NS/IN': 2001:7fd::1#53
-Aug 24 21:10:48 ns01 named[2861]: network unreachable resolving './DNSKEY/IN': 2001:7fe::53#53
-Aug 24 21:10:48 ns01 named[2861]: network unreachable resolving './NS/IN': 2001:7fe::53#53
-Aug 24 21:10:58 ns01 named[2861]: managed-keys-zone/view1: Unable to fetch DNSKEY set '.': timed out
-Aug 24 21:10:58 ns01 named[2861]: resolver priming query complete
-Aug 24 21:10:58 ns01 named[2861]: managed-keys-zone/default: Unable to fetch DNSKEY set '.': timed out
-Aug 24 21:10:58 ns01 named[2861]: resolver priming query complete
+Aug 24 21:24:42 ns01 named[3019]: network unreachable resolving './DNSKEY/IN': 2001:500:a8::e#53
+Aug 24 21:24:42 ns01 named[3019]: network unreachable resolving './NS/IN': 2001:500:a8::e#53
+Aug 24 21:24:42 ns01 named[3019]: network unreachable resolving './DNSKEY/IN': 2001:503:c27::2:30#53
+Aug 24 21:24:42 ns01 named[3019]: network unreachable resolving './NS/IN': 2001:503:c27::2:30#53
+Aug 24 21:24:52 ns01 named[3019]: managed-keys-zone/view1: Unable to fetch DNSKEY set '.': timed out
+Aug 24 21:24:52 ns01 named[3019]: resolver priming query complete
+Aug 24 21:24:52 ns01 named[3019]: managed-keys-zone/default: Unable to fetch DNSKEY set '.': timed out
+Aug 24 21:24:52 ns01 named[3019]: resolver priming query complete
+Aug 24 21:26:01 ns01 named[3019]: client @0x7f0b1803c3e0 192.168.50.15#48036/key zonetransfer.key: view view1: signer "zonetransfer.key" approved
+Aug 24 21:26:01 ns01 named[3019]: client @0x7f0b1803c3e0 192.168.50.15#48036/key zonetransfer.key: view view1: updating zone 'ddns.lab/IN': adding an RR at 'www.ddns.lab' A 192.168.50.15
+
+```
+[vagrant@client ~]$ nsupdate -k /etc/named.zonetransfer.key
+> server 192.168.50.10
+> zone ddns.lab
+> update add www.ddns.lab. 60 A 192.168.50.15
+> send
+> 
 ```
