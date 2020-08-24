@@ -143,7 +143,6 @@ tcp6       0      0 :::11988                :::*                    LISTEN      
 update failed: SERVFAIL
 > 
 ```
-#### 2.1 Удаление всех исключений 
 - Выполним команду ```audit2why < /var/log/audit/audit.log```
 ```
 [root@ns01 vagrant]# audit2why < /var/log/audit/audit.log
