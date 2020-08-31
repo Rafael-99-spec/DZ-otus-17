@@ -221,10 +221,13 @@ type=AVC msg=audit(1598624073.018:951): avc:  denied  { rename } for  pid=3469 c
 - Как описано в выводе, для решения проблемы воспользуемся утилитой audit2allow, который добавит разрешение основываясь на содержании файла - /var/log/audit/audit.log
 - Выполним команды ```audit2allow -M named-selinux --debug < /var/log/audit/audit.log``` и ```semodule -i named-selinux.pp```. После чего наша зона будет обновлятся а новые записи будут добавлятся в нужный файл.
 - Можно коротко описать еще три варианта решения проблемы 
-### 1 Отключение selinux (худший вариант);
+### 1й способ 
+- Отключение selinux (худший вариант);
 - Выполним команду ```cat /var/log/messages | grep ausearch```
 ```
 Aug 31 16:22:29 ns01 python: SELinux is preventing isc-worker0000 from unlink access on the file named.ddns.lab.view1.#012#012*****  Plugin catchall_labels (83.8 confidence) suggests   *******************#012#012If you want to allow isc-worker0000 to have unlink access on the named.ddns.lab.view1 file#012Then you need to change the label on named.ddns.lab.view1#012Do#012# semanage fcontext -a -t FILE_TYPE 'named.ddns.lab.view1'#012where FILE_TYPE is one of the following: dnssec_trigger_var_run_t, ipa_var_lib_t, krb5_host_rcache_t, krb5_keytab_t, named_cache_t, named_log_t, named_tmp_t, named_var_run_t, named_zone_t.#012Then execute:#012restorecon -v 'named.ddns.lab.view1'#012#012#012*****  Plugin catchall (17.1 confidence) suggests   **************************#012#012If you believe that isc-worker0000 should be allowed unlink access on the named.ddns.lab.view1 file by default.#012Then you should report this as a bug.#012You can generate a local policy module to allow this access.#012Do#012allow this access for now by executing:#012# ausearch -c 'isc-worker0000' --raw | audit2allow -M my-iscworker0000#012# semodule -i my-iscworker0000.pp#012
 ```
-### 2 Команда ```ausearch -c 'isc-worker0000' --raw | audit2allow -M my-iscworker0000 | semodule -i my-iscworker0000.pp```;
-### 3 Присвоение файлу ```named.ddns.lab.view1``` один из вышеперечисленных(в выводе из лог-файла) типов ```dnssec_trigger_var_run_t, ipa_var_lib_t, krb5_host_rcache_t, krb5_keytab_t, named_cache_t, named_log_t, named_tmp_t, named_var_run_t, named_zone_t```, с помощью утилиты ```semanage```. Команда - ```semanage fcontext -a -t FILE_TYPE 'named.ddns.lab.view1'```.
+### 2й способ 
+- Команда ```ausearch -c 'isc-worker0000' --raw | audit2allow -M my-iscworker0000 | semodule -i my-iscworker0000.pp```;
+### 3й способ 
+- Присвоение файлу ```named.ddns.lab.view1``` один из вышеперечисленных(в выводе из лог-файла) типов ```dnssec_trigger_var_run_t, ipa_var_lib_t, krb5_host_rcache_t, krb5_keytab_t, named_cache_t, named_log_t, named_tmp_t, named_var_run_t, named_zone_t```, с помощью утилиты ```semanage```. Команда - ```semanage fcontext -a -t FILE_TYPE 'named.ddns.lab.view1'```.
