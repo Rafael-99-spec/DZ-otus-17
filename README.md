@@ -218,5 +218,8 @@ type=AVC msg=audit(1598624073.018:951): avc:  denied  { rename } for  pid=3469 c
 
 		Possible mismatch between current in-memory boolean settings vs. permanent ones.
 ```
-
-
+- Как описано в выводе, для решения проблемы воспользуемся утилитой audit2allow, который добавит разрешение основываясь на содержании файла - /var/log/audit/audit.log
+- Выполним команды ```audit2allow -M named-selinux --debug < /var/log/audit/audit.log``` и ```semodule -i named-selinux.pp```. После чего наша зона будет обновлятся а новые записи будут добавлятся в нужный файл.
+- Монж коротко описать еще три варианта решения проблемы 
+- Отключение selinux (худший вариант)
+- Выполним команду cat /var/log/messages | grep ausearch
