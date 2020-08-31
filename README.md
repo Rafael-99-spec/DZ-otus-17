@@ -208,3 +208,4 @@ Aug 24 21:24:52 ns01 named[3019]: resolver priming query complete
 Aug 24 21:26:01 ns01 named[3019]: client @0x7f0b1803c3e0 192.168.50.15#48036/key zonetransfer.key: view view1: signer "zonetransfer.key" approved
 Aug 24 21:26:01 ns01 named[3019]: client @0x7f0b1803c3e0 192.168.50.15#48036/key zonetransfer.key: view view1: updating zone 'ddns.lab/IN': adding an RR at 'www.ddns.lab' A 192.168.50.15
 ```
+- Более оптимальным и менее опасным решением проблемы будет анализ лога через утилиту audit2why - ```audit2why < /var/log/audit/audit.log```
