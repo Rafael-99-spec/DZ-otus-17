@@ -209,3 +209,14 @@ Aug 24 21:26:01 ns01 named[3019]: client @0x7f0b1803c3e0 192.168.50.15#48036/key
 Aug 24 21:26:01 ns01 named[3019]: client @0x7f0b1803c3e0 192.168.50.15#48036/key zonetransfer.key: view view1: updating zone 'ddns.lab/IN': adding an RR at 'www.ddns.lab' A 192.168.50.15
 ```
 - Более оптимальным и менее опасным решением проблемы будет анализ лога через утилиту audit2why - ```audit2why < /var/log/audit/audit.log```
+```
+type=AVC msg=audit(1598624073.018:951): avc:  denied  { rename } for  pid=3469 comm="isc-worker0000" name="tmp-bLASqNVp6V" dev="sda1" ino=486352 scontext=system_u:system_r:named_t:s0 tcontext=system_u:object_r:etc_t:s0 tclass=file permissive=0
+
+	Was caused by:
+		Unknown - would be allowed by active policy
+		Possible mismatch between this policy and the one under which the audit message was generated.
+
+		Possible mismatch between current in-memory boolean settings vs. permanent ones.
+```
+
+
